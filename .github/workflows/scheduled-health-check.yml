@@ -1,0 +1,20 @@
+name: Scheduled Health Check
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Backend Health
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://wst-backend-production.up.railway.app/health/ready)
+          if [ "$response" -eq 200 ]; then
+            echo "✅ Backend is healthy (HTTP $response)"
+          else
+            echo "❌ Backend check failed (HTTP $response)"
+            exit 1
+          fi
